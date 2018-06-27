@@ -1,0 +1,15 @@
+{
+  "name": "playrite.js",
+  "version": "1.0.0",
+  "description": "JUSTSYSTEM PlayRite to JavaScript Translator",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "jison": "jison playrite.jison"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jison": "^0.4.18"
+  }
+}

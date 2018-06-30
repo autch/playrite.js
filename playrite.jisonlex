@@ -11,8 +11,8 @@ ident                   (\w|[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uF900-\uFAF
 
 %%
 
-<COMMENT>\r?\n          {this.popState(); return 'EOS';}
-<COMMENT>[^\r\n]*         {  return 'COMMENT' }
+<COMMENT>\r?\n          { this.popState(); this.unput("\r\n"); return 'COMMENT'; }
+<COMMENT>.*              { this.more(); }
 <SKIP_EOS>\r?\n           { this.popState(); }
 \r?\n                   return 'EOS';
 "!!"                    { this.pushState('COMMENT'); }

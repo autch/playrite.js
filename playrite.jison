@@ -23,24 +23,16 @@ defs_or_stmts: definition   { $$ = [$1]; }
 | defs_or_stmts statement   { $1.push($2); $$ = $1; }
 ;
 
-defs: definition        { $$ = [$1]; }
-| defs definition       {$1.push($2); $$ = $1; }
-;
-
-statements: statement { $$ = [$1];  }
-| statements statement { $1.push($2); $$ = $1; }
-;
-
 definition: defun
 | defsub
 ;
 
-eos: EOS                    { $$ = ""; }
+eos: EOS                    { $$ = [] }
 | COMMENT EOS               { $$ = ['COMMENT', $1 ]}
 ;
 
 statement: eos
-| stmt eos                { $$ = $1 }
+| stmt eos                { $$ = [$1, $2] }
 ;
 
 flow_control: select_case
@@ -54,49 +46,49 @@ stmt: flow_control
 | proccall
 | call_stmt
 | assign
-| EXIT_FOR                    { $$ = "break"}
-| EXIT_FOREACH                    { $$ = "break"}
-| EXIT_DO                     { $$ = "break"}
-| EXIT_SUB                  { $$ = "return"}
-| EXIT_FUNCTION             { $$ = "return _prr_result" }
+| EXIT_FOR                    { $$ = ['EXIT_FOR']}
+| EXIT_FOREACH                    { $$ = ['EXIT_FOREACH']}
+| EXIT_DO                     { $$ = ['EXIT_DO']}
+| EXIT_SUB                  { $$ = ["EXIT_SUB"]}
+| EXIT_FUNCTION             { $$ = ["EXIT_FUNCTION"] }
 ;
 
-defun: FUNCTION IDENT decl_args EOS suite END_FUNCTION  { $$ = ['DEFUN', $2, $3, $5 ] }
+defun: FUNCTION IDENT decl_args eos suite END_FUNCTION  { $$ = ['DEFUN', $2, $3, $5 ] }
 ;
-defsub: SUB IDENT decl_args EOS suite END_SUB           { $$ = ['DEFSUB', $2, $3, $5] }
+defsub: SUB IDENT decl_args eos suite END_SUB           { $$ = ['DEFSUB', $2, $3, $5] }
 ;
 suite: statement            {$$ = [$1]; }
 | suite statement           {$1.push($2); $$ = $1; }
 ;
 
-if: IF expr EOS suite elseif_list else END_IF           { $$ = ['IF', $2, $4, $5, $6 ]}
+if: IF expr eos suite elseif_list else END_IF           { $$ = ['IF', $2, $4, $5, $6 ]}
 ;
 elseif_list: elseif         { $$ = [$1]; }
 | elseif_list elseif        { $1.push($2); $$ = $1; }
 ;
 elseif:                     { $$ = null;}
-| ELSE_IF expr EOS suite    { $$ = ['ELSE_IF', $2, $4] }
+| ELSE_IF expr eos suite    { $$ = ['ELSE_IF', $2, $4] }
 ;
 else:                       { $$ = null; }
-| ELSE EOS suite            { $$ = ['ELSE', $3] }
+| ELSE eos suite            { $$ = ['ELSE', $3] }
 ;
 
-select_case: SELECT_CASE expr EOS cases END_SELECT  { $$ = ['SELECT', $2, $4 ]; }
+select_case: SELECT_CASE expr eos cases END_SELECT  { $$ = ['SELECT', $2, $4 ]; }
 ;
 cases: case                 { $$ = [$1]; }
 | cases case                { $1.push($2); $$ = $1; }
 ;
-case: CASE expr EOS suite   { $$ = ['CASE', $2, $4]; }
-| CASE_ELSE EOS suite       { $$ = ['CASE_ELSE', $3]; }
+case: CASE expr eos suite   { $$ = ['CASE', $2, $4]; }
+| CASE_ELSE eos suite       { $$ = ['CASE_ELSE', $3]; }
 ;
 
-for: FOR VAR_NAME EQ expr TO expr EOS suite NEXT { $$ = ['FOR', $2, $4, $6, $8]}
+for: FOR VAR_NAME EQ expr TO expr eos suite NEXT { $$ = ['FOR', $2, $4, $6, $8]}
 ;
-foreach: FOR_EACH VAR_NAME IN var_ref EOS suite NEXT { $$ = ['FOR_EACH', $2, $4, $6]}
+foreach: FOR_EACH VAR_NAME IN var_ref eos suite NEXT { $$ = ['FOR_EACH', $2, $4, $6]}
 ;
-loops: DO EOS suite LOOP            { $$ = ['LOOP', $3 ] }
-| DO cond EOS suite LOOP            { $$ = ['WHILE', $2, $4 ]}
-| DO EOS suite LOOP cond            { $$ = ['DO_WHILE', $5, $3 ]}
+loops: DO eos suite LOOP            { $$ = ['LOOP', $3 ] }
+| DO cond eos suite LOOP            { $$ = ['WHILE', $2, $4 ]}
+| DO eos suite LOOP cond            { $$ = ['DO_WHILE', $5, $3 ]}
 ;
 cond: WHILE expr                    { $$ = ['WHILE', $2] }
 | UNTIL expr                        { $$ = ['UNTIL', $2] }
@@ -108,15 +100,15 @@ assign_left: var_or_func            { $$ = [$1] }
 | assign_left COMMA var_or_func    { $1.push($3); $$ = $1 }
 ;
 var_or_func: var_ref
-| IDENT                             { $$ = "_prr_result" }
+| IDENT                             { $$ = ['SET_RESULT', $1] }
 ;
 
 value:  LBRACE expr RBRACE      { $$ = $2 }
 | STRING                          { $$ = yytext }
 | DIGITS                          { $$ = Number(yytext); }
 | var_ref
-| TRUE                            { $$ = "true" }
-| FALSE                           { $$ = "false" }
+| TRUE                            { $$ = 'true' }
+| FALSE                           { $$ = 'false' }
 | NIL                               { $$ = "null" }
 ;
 

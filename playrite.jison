@@ -118,7 +118,7 @@ var_ref: VAR_NAME                        { $$ = ['REF', $1] } /* simple referenc
 
 proccall: IDENT call_args           { $$ = ['CALL', $1, $2] }
 ;
-call_stmt: CALL IDENT call_args     { $$ = ['CALL', $1, $2] }
+call_stmt: CALL IDENT call_args     { $$ = ['CALL', $2, $3] }
 ;
 funcall: IDENT decl_args            { $$ = ['FUNCALL', $1, $2] }
 ;

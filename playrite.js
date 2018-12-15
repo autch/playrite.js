@@ -1313,14 +1313,10 @@ case 62:
 
 case 63:
     /*! Production::    proccall : IDENT call_args */
-
-    this.$ = ['CALL', yyvstack[yysp - 1], yyvstack[yysp]]
-    break;
-
 case 64:
     /*! Production::    call_stmt : CALL IDENT call_args */
 
-    this.$ = ['CALL', yyvstack[yysp - 2], yyvstack[yysp - 1]]
+    this.$ = ['CALL', yyvstack[yysp - 1], yyvstack[yysp]]
     break;
 
 case 65:

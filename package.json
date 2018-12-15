@@ -6,11 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "jison": "jison playrite.jison playrite.jisonlex",
-    "jison-t": "jison -t playrite.jison playrite.jisonlex"
+    "jison-t": "jison -t playrite.jison playrite.jisonlex",
+    "test-pr2js": "node pr2js.js JELIZA.TXT"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "jison-gho": "^0.6.1-215"
+  },
+  "dependencies": {
+    "@types/estree": "0.0.39",
+    "escodegen": "^1.11.0"
   }
 }
